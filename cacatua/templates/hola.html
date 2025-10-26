@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% extends "base.html" %} {% load static %}
+<html>
+  <title>diversion</title>
+  <meta charset="UTF-8" />
+  {% block content %}
+  <body>
+    <div>
+      <section>
+        <h1 class="flex justify-center">Gato McDonals</h1>
+        <img
+          src="{% static 'images/images.jpg' %}"
+          class="scale-100 block mx-auto"
+        />
+        <p class="flex justify-center">
+          En esta pagina te contare todo lo que necesitas saber
+        </p>
+      </section>
+    </div>
+  </body>
+  {% endblock content %}
+  <html></html>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% load static tailwind_tags %} {%load static%}
+<html>
+  <head>
+    <title>{% block title %} default content {% endblock title %}</title>
+    <meta charset="UTF-8" />
+    {% tailwind_css %}
+  </head>
+
+  <body>
+    <header class="bg-black">
+      <nav class="flex justify-center space-x-6 py-4">
+        <a
+          href="{% url 'homepage' %}"
+          class="text-2xl text-white font-bold hover:text-blue-500"
+        >
+          Home</a
+        >
+        <a
+          href="{% url 'loquendo:apppage' %}"
+          class="text-2xl text-white font-bold hover:text-red-500"
+        >
+          App</a
+        >
+      </nav>
+    </header>
+    <main>
+      {% block content %} Arriba estan los botone {% endblock content%}
+    </main>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Person List</title>
+  </head>
+  <body>
+    <h1>Personas registradas</h1>
+    <ul>
+      {% for person in persons %}
+      <li>{{ person.name }} ({{ person.birth }})</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
