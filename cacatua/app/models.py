@@ -1,16 +1,10 @@
 # Create your models here.
 from django.db import models
-from django.utils.text import slugify
 
 class Person(models.Model):
     name = models.CharField(max_length=50)
     birth = models.DateField()
     slug = models.SlugField()
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -22,3 +16,11 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+class User(models.Model):
+    name = models.CharField(max_length=50)
+    mail = models.CharField(max_length=100)
+    propic = models.ImageField(upload_to='users/', default='def_user.png', blank=True)
+
+    def str(self):
+        return self.name

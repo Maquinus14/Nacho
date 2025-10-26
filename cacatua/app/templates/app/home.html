@@ -14,5 +14,13 @@
       </li>
       {% endfor %}
     </ul>
+    <h2 class="p-10">Lista de Usuarios</h2>
+    {% for user in users %}
+    <div class="items-center flex flex-col">
+      <h2>{{ user.name }}</h2>
+      <p class="mb-4">{{ user.mail }}</p>
+      <img src="{{ user.propic.url }}" alt="{{ user.name }}" width="150" />
+    </div>
+    {% endfor %}
   </body>
 </html>
