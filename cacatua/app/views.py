@@ -14,4 +14,4 @@ def diversion(request):
 
 def divertido(request, slug):
     person = Person.objects.get(slug=slug)
-    return render(request, 'home.html', {'person': person})
+    return render(request, 'person.html', {'person': person})
