@@ -28,6 +28,22 @@
         >
           Users</a
         >
+        <a
+          href="{% url 'users:login' %}"
+          class="text-2xl text-white font-bold hover:text-red-500"
+          >Login</a
+        >
+        <p class="text-2xl text-white font-bold hover:text-red-500">
+          User: {{user.username}}
+        </p>
+        <form
+          action="{% url 'users:logout' %}"
+          method="post"
+          class="text-2xl text-white font-bold hover:text-red-500"
+        >
+          {% csrf_token %}
+          <button>Logout</button>
+        </form>
       </nav>
     </header>
     <main>{% block content %} Arriba estan los botone {% endblock %}</main>
