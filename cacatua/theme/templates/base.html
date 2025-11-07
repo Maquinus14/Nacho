@@ -1,51 +1,129 @@
 <!DOCTYPE html>
-{% load static tailwind_tags %} {%load static%}
+{% load static tailwind_tags %} {% load static %}
 <html>
   <head>
     <title>{% block title %} default content {% endblock title %}</title>
     <meta charset="UTF-8" />
     {% tailwind_css %}
+    <style>
+      /* ==== NAVBAR ==== */
+      nav {
+        background: linear-gradient(to right, #000000, #111827);
+        padding: 12px 0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      }
+
+      /* ==== ENLACES, TEXTO Y BOTÓN DE LOGOUT ==== */
+      nav a,
+      nav p,
+      nav .logout-btn {
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        transition: color 0.2s, transform 0.2s;
+      }
+
+      nav a:hover,
+      nav .logout-btn:hover {
+        color: #f87171;
+        transform: scale(1.05);
+      }
+
+      /* ==== DISTRIBUCIÓN DEL NAV ==== */
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .nav-left,
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      /* ==== TEXTO DE USUARIO ==== */
+      .username {
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+
+      /* ==== GENERAL ==== */
+      body {
+        margin: 0;
+        background-color: #ffffff;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+      }
+
+      /* ==== AISLAR FORMULARIO DE LOGOUT ==== */
+      form.logout-form {
+        all: unset;
+        display: inline;
+      }
+
+      /* Evita que estilos globales de otros formularios afecten al logout */
+      form.logout-form button {
+        all: unset;
+        color: #ffffff !important;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: color 0.2s, transform 0.2s;
+      }
+
+      form.logout-form button:hover {
+        color: #f87171;
+        transform: scale(1.05);
+      }
+    </style>
   </head>
 
   <body>
-    <header class="bg-black">
-      <nav class="flex justify-center space-x-6 py-4">
-        <a
-          href="{% url 'homepage' %}"
-          class="text-2xl text-white font-bold hover:text-blue-500"
-        >
-          Home</a
-        >
-        <a
-          href="{% url 'loquendo:apppage' %}"
-          class="text-2xl text-white font-bold hover:text-red-500"
-        >
-          App</a
-        >
-        <a
-          href="{% url 'users:home' %}"
-          class="text-2xl text-white font-bold hover:text-red-500"
-        >
-          Users</a
-        >
-        <a
-          href="{% url 'users:login' %}"
-          class="text-2xl text-white font-bold hover:text-red-500"
-          >Login</a
-        >
-        <p class="text-2xl text-white font-bold hover:text-red-500">
-          User: {{user.username}}
-        </p>
-        <form
-          action="{% url 'users:logout' %}"
-          method="post"
-          class="text-2xl text-white font-bold hover:text-red-500"
-        >
-          {% csrf_token %}
-          <button>Logout</button>
-        </form>
+    <header>
+      <nav>
+        <div class="nav-container">
+          <!-- Sección izquierda -->
+          <div class="nav-left">
+            <a href="{% url 'homepage' %}">Home</a>
+            <a href="{% url 'loquendo:apppage' %}">App</a>
+            <a href="{% url 'users:home' %}">Users</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'products:home' %}">Products</a>
+            {% endif %}
+          </div>
+
+          <!-- Sección derecha -->
+          <div class="nav-right">
+            {% if user.is_authenticated %}
+            <p class="username">User: {{ user.username }}</p>
+            <form
+              action="{% url 'users:logout' %}"
+              method="post"
+              class="logout-form"
+            >
+              {% csrf_token %}
+              <button type="submit" class="logout-btn">Logout</button>
+            </form>
+            {% else %}
+            <a href="{% url 'users:login' %}">Login</a>
+            {% endif %}
+          </div>
+        </div>
       </nav>
     </header>
-    <main>{% block content %} Arriba estan los botone {% endblock %}</main>
+
+    <main>{% block content %} Arriba están los botones {% endblock %}</main>
   </body>
 </html>

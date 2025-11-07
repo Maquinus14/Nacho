@@ -1,10 +1,74 @@
 <!DOCTYPE html>
-
 {% extends "base.html" %} {% load static %} {% block content %}
 
-<h1 class="text-8xl font-[Times New Roman]">Register form!</h1>
-<form class="text-center" action="/users/login/" method="post">
-  {% csrf_token %} {{ form }}
-  <button type="submit">Submit form!</button>
+<style>
+  /* === Estilos generales del formulario de login === */
+  form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #374151;
+    text-align: left;
+  }
+
+  form input[type="text"],
+  form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+    background-color: white;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  form input:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 4px rgba(37, 99, 235, 0.3);
+  }
+
+  button[type="submit"] {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #1e40af;
+  }
+
+  h1 {
+    text-align: center;
+    margin-top: 40px;
+    font-family: "Times New Roman", serif;
+    color: #111827;
+  }
+</style>
+
+<h1>Login form!</h1>
+
+<form action="/users/login/" method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Login</button>
 </form>
+
 {% endblock content %}

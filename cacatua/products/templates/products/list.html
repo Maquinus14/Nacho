@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+{% extends "base.html" %} {% load static %} {% block content %}
+
+<style>
+  /* ==== FORMULARIO ==== */
+  form {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+  }
+
+  form input[type="text"],
+  form input[type="number"],
+  form input[type="email"],
+  form input[type="password"],
+  form select,
+  form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    border: 1px solid #999;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: #f2f2f2;
+    color: #111;
+  }
+
+  form input:focus,
+  form select:focus,
+  form textarea:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.6);
+    background-color: #fff;
+  }
+
+  .form-submit {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .form-submit:hover {
+    background-color: #2563eb;
+  }
+
+  /* ==== PRODUCTOS ==== */
+  .product-item {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    margin: 10px auto;
+    max-width: 600px;
+    background-color: #fff;
+  }
+
+  /* ==== TÍTULOS ==== */
+  h1,
+  h2 {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 4rem; /* Tamaño equivalente a text-8xl */
+    font-family: "Times New Roman", serif;
+  }
+
+  h2 {
+    font-size: 2rem; /* Tamaño equivalente a text-4xl */
+  }
+
+  p.text-center {
+    text-align: center;
+  }
+</style>
+
+<h1>Productos</h1>
+
+<!-- Formulario para publicar productos -->
+<form action="{% url 'products:home' %}" method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit" class="form-submit">Publicar producto!</button>
+</form>
+
+<!-- Lista de productos -->
+<h2>Productos Publicados</h2>
+
+{% for product in product_list %}
+<div class="product-item">
+  <h3 class="text-2xl font-bold">{{ product.name }}</h3>
+  <p><strong>Precio:</strong> ${{ product.price }}</p>
+  <p><strong>Categoría:</strong> {{ product.get_category_display }}</p>
+  <p><strong>Descripción:</strong> {{ product.description }}</p>
+  <p><strong>Publicado por:</strong> {{ product.user.username }}</p>
+  <p><strong>Fecha:</strong> {{ product.date_published }}</p>
+</div>
+{% empty %}
+<p class="text-center">No hay productos publicados todavía.</p>
+{% endfor %} {% endblock content %}
