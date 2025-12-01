@@ -11,7 +11,7 @@ def products_list_view(request):
             new_product = form.save(commit=False)
             new_product.user = request.user
             new_product.save()
-            return redirect('products:home')
+            return redirect('products:list')
     else:
         form = UploadProduct()
     

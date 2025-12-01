@@ -100,8 +100,9 @@
             <a href="{% url 'loquendo:apppage' %}">App</a>
             <a href="{% url 'users:home' %}">Users</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'products:home' %}">Products</a>
+            <a href="{% url 'products:list' %}">Products</a>
             {% endif %}
+            <a href="{% url 'games:game_list' %}">Games</a>
           </div>
 
           <!-- Sección derecha -->

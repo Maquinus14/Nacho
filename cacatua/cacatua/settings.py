@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'theme',
     'users',
     'products',
+    'games',
 ]
 
 MIDDLEWARE = [

@@ -84,7 +84,7 @@
 <h1>Productos</h1>
 
 <!-- Formulario para publicar productos -->
-<form action="{% url 'products:home' %}" method="post">
+<form action="{% url 'products:list' %}" method="post">
   {% csrf_token %} {{ form.as_p }}
   <button type="submit" class="form-submit">Publicar producto!</button>
 </form>

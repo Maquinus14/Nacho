@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+{% extends 'base.html' %} {% block content %}
+<div style="max-width: 700px; margin: 30px auto; padding: 20px">
+  <h1>🎮 {{ game.room_name }}</h1>
+  <p>Creador: {{ game.owner.username }}</p>
+  <p>Tú: {{ user.username }}</p>
+
+  {% if game.game_state == 'active' %}
+  <p>🎯 Turno del Jugador {{ game.active_player }}</p>
+  {% elif game.game_state == 'won' %}
+  <p>🏆 ¡Ganó el Jugador {{ game.winner }}!</p>
+  {% else %}
+  <p>🤝 ¡Es un empate!</p>
+  {% endif %}
+
+  <!-- Tablero SIMPLIFICADO -->
+  <div style="margin: 30px 0">
+    {% if game.game_state == 'active' and user == game.owner %}
+    <form method="POST">
+      {% csrf_token %}
+      <div
+        style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px"
+      >
+        {% for cell in game.board %}
+        <button
+          type="submit"
+          name="submit"
+          value="{{ forloop.counter0 }}"
+          style="
+            width: 80px;
+            height: 80px;
+            font-size: 30px;
+            background-color: white;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+          "
+        >
+          {% if cell == 'X' %}❌{% elif cell == 'O' %}⭕{% else %}⬜{% endif %}
+        </button>
+        {% endfor %}
+      </div>
+    </form>
+    {% else %}
+    <div
+      style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px"
+    >
+      {% for cell in game.board %}
+      <div
+        style="
+          width: 80px;
+          height: 80px;
+          font-size: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: white;
+          border: 2px solid #4caf50;
+          border-radius: 8px;
+        "
+      >
+        {% if cell == 'X' %}❌{% elif cell == 'O' %}⭕{% else %}⬜{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Botones de acción -->
+  <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap">
+    <a
+      href="{% url 'games:game_list' %}"
+      style="
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      "
+      onmouseover="this.style.backgroundColor='#5a6268'"
+      onmouseout="this.style.backgroundColor='#6c757d'"
+    >
+      ↩ Volver a Juegos
+    </a>
+
+    {% if game.game_state != 'active' and user == game.owner %}
+    <form
+      method="POST"
+      action="{% url 'games:delete_game' game.id %}"
+      style="display: inline; margin: 0"
+    >
+      {% csrf_token %}
+      <button
+        type="submit"
+        style="
+          padding: 12px 24px;
+          background-color: #dc3545;
+          color: white;
+          font-weight: 500;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        "
+        onmouseover="this.style.backgroundColor='#c82333'"
+        onmouseout="this.style.backgroundColor='#dc3545'"
+      >
+        🗑️ Eliminar Juego
+      </button>
+    </form>
+    {% endif %}
+
+    <!-- Botón de actualizar -->
+    <button
+      onclick="location.reload()"
+      style="
+        padding: 12px 24px;
+        background-color: #17a2b8;
+        color: white;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      "
+      onmouseover="this.style.backgroundColor='#138496'"
+      onmouseout="this.style.backgroundColor='#17a2b8'"
+    >
+      🔄 Actualizar
+    </button>
+  </div>
+
+  <!-- Información adicional -->
+  <div
+    style="
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #4caf50;
+    "
+  >
+    <p style="margin: 0; color: #495057; font-size: 14px">
+      <strong>Nota:</strong>
+      {% if game.game_state == 'active' %} {% if user == game.owner %} Haz clic
+      en una casilla vacía para colocar tu ficha. {% else %} Solo el creador del
+      juego puede hacer movimientos. {% endif %} {% elif game.game_state ==
+      'won' %} ¡El juego ha terminado! Puedes crear un nuevo juego si lo deseas.
+      {% else %} ¡Ha sido un empate! Puedes crear un nuevo juego si lo deseas.
+      {% endif %}
+    </p>
+  </div>
+</div>
+
+<style>
+  /* Efectos hover para todos los botones */
+  a:hover,
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  a,
+  button {
+    transition: all 0.3s ease;
+  }
+</style>
+{% endblock %}

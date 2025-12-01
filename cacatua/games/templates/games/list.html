@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+{% extends 'base.html' %} {% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 30px 20px">
+  <h1
+    style="
+      font-size: 2rem;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 30px;
+      text-align: center;
+    "
+  >
+    🎮 Juegos Activos de Tres en Raya
+  </h1>
+
+  {% if messages %} {% for message in messages %}
+  <div
+    style="
+      background-color: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    "
+  >
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %}
+
+  <!-- Lista de juegos activos -->
+  <div
+    style="
+      background-color: #f9fafb;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    "
+  >
+    <h2
+      style="
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 20px;
+      "
+    >
+      Juegos Activos
+    </h2>
+
+    {% if games %}
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      {% for game in games %}
+      <div
+        style="
+          background-color: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          border: 1px solid #e5e7eb;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+          "
+        >
+          <div>
+            <h3
+              style="
+                font-size: 1.25rem;
+                font-weight: bold;
+                color: #1f2937;
+                margin-bottom: 8px;
+              "
+            >
+              🎯 {{ game.room_name }}
+            </h3>
+            <p style="color: #6b7280; margin-bottom: 4px">
+              👤 <strong>Creador:</strong> {{ game.owner.username }}
+            </p>
+            <p style="color: #6b7280">
+              🔄 <strong>Estado:</strong>
+              {% if game.game_state == 'active' %}
+              <span style="color: #059669; font-weight: 600"
+                >Activo - Turno del Jugador {{ game.active_player }}</span
+              >
+              {% elif game.game_state == 'won' %}
+              <span style="color: #2563eb; font-weight: 600"
+                >🏆 Ganó el Jugador {{ game.winner }}</span
+              >
+              {% else %}
+              <span style="color: #6b7280; font-weight: 600">🤝 Empate</span>
+              {% endif %}
+            </p>
+          </div>
+
+          <div>
+            <a
+              href="{% url 'games:game_detail' game.id %}"
+              style="
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #10b981;
+                color: white;
+                font-weight: 500;
+                border-radius: 8px;
+                text-decoration: none;
+                transition: background-color 0.2s;
+              "
+            >
+              {% if game.game_state == 'active' %} {% if user == game.owner %}
+              Jugar Partida {% else %} Ver Partida {% endif %} {% else %} Ver
+              Resultado {% endif %}
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 40px 20px">
+      <p style="color: #6b7280; font-size: 1.125rem; font-style: italic">
+        No hay juegos activos. ¡Crea uno abajo!
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Formulario para crear nuevo juego -->
+  <div
+    style="
+      background-color: #f0fdf4;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #bbf7d0;
+    "
+  >
+    <h2
+      style="
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 20px;
+      "
+    >
+      Crear Nuevo Juego
+    </h2>
+    <form method="POST" action="{% url 'games:create_game' %}">
+      {% csrf_token %}
+      <div style="margin-bottom: 24px">
+        <label
+          for="room_name"
+          style="
+            display: block;
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 8px;
+          "
+          >Nombre de la Sala:</label
+        >
+        <input
+          type="text"
+          id="room_name"
+          name="room_name"
+          style="
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #34d399;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+          "
+          placeholder="Escribe un nombre único para la sala"
+          required
+        />
+        <p style="color: #6b7280; font-size: 0.875rem; margin-top: 8px">
+          Elige un nombre único para tu sala de juego.
+        </p>
+      </div>
+      <button
+        type="submit"
+        style="
+          padding: 12px 24px;
+          background-color: #10b981;
+          color: white;
+          font-weight: 600;
+          border: none;
+          border-radius: 8px;
+          font-size: 1rem;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        "
+      >
+        🎮 Crear Nuevo Juego
+      </button>
+    </form>
+  </div>
+
+  <!-- Instrucciones -->
+  <div
+    style="
+      background-color: #eff6ff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #93c5fd;
+    "
+  >
+    <h3
+      style="
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 12px;
+      "
+    >
+      Cómo jugar:
+    </h3>
+    <ul style="color: #4b5563; padding-left: 20px; line-height: 1.6">
+      <li>Crea un nuevo juego con un nombre único para la sala</li>
+      <li>Solo el creador del juego puede hacer movimientos</li>
+      <li>Otros usuarios pueden ver la partida en tiempo real</li>
+      <li>Actualiza la página para ver el último estado del juego</li>
+      <li>Los juegos se guardan automáticamente en la base de datos</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
