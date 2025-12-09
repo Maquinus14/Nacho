@@ -5,49 +5,39 @@
   <p>Creador: {{ game.owner.username }}</p>
   <p>Tú: {{ user.username }}</p>
 
+  {% if game.player2 %}
+  <p>Jugador 2: {{ game.player2.username }}</p>
+  {% else %}
+  <p>Jugador 2: Esperando jugador...</p>
+  {% endif %}
+
+  <p>
+    Jugador 1 (❌): {{ game.owner.username }}<br />
+    {% if game.player2 %} Jugador 2 (⭕): {{ game.player2.username }}
+    <!---->
+    {% endif%}
+    <!---->
+  </p>
+
   {% if game.game_state == 'active' %}
-  <p>🎯 Turno del Jugador {{ game.active_player }}</p>
+  <p id="turn-message">Turno del Jugador {{ game.active_player }}</p>
   {% elif game.game_state == 'won' %}
   <p>🏆 ¡Ganó el Jugador {{ game.winner }}!</p>
   {% else %}
   <p>🤝 ¡Es un empate!</p>
   {% endif %}
 
-  <!-- Tablero SIMPLIFICADO -->
+  <!-- Tablero -->
   <div style="margin: 30px 0">
-    {% if game.game_state == 'active' and user == game.owner %}
-    <form method="POST">
-      {% csrf_token %}
-      <div
-        style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px"
-      >
-        {% for cell in game.board %}
-        <button
-          type="submit"
-          name="submit"
-          value="{{ forloop.counter0 }}"
-          style="
-            width: 80px;
-            height: 80px;
-            font-size: 30px;
-            background-color: white;
-            border: 2px solid #4caf50;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-          "
-        >
-          {% if cell == 'X' %}❌{% elif cell == 'O' %}⭕{% else %}⬜{% endif %}
-        </button>
-        {% endfor %}
-      </div>
-    </form>
-    {% else %}
     <div
       style="display: grid; grid-template-columns: repeat(3, 80px); gap: 5px"
+      id="game-board"
     >
-      {% for cell in game.board %}
+      {% for i in "012345678" %}
       <div
+        id="cell-{{ forloop.counter0 }}"
+        class="game-cell"
+        data-position="{{ forloop.counter0 }}"
         style="
           width: 80px;
           height: 80px;
@@ -58,13 +48,21 @@
           background-color: white;
           border: 2px solid #4caf50;
           border-radius: 8px;
+          cursor: pointer;
+          transition: background-color 0.3s;
         "
       >
-        {% if cell == 'X' %}❌{% elif cell == 'O' %}⭕{% else %}⬜{% endif %}
+        {% with idx=forloop.counter0 %}
+        <!---->
+        {% if game.board|slice:idx|slice:"-1" == 'X' %}❌
+        <!---->
+        {% elif game.board|slice:idx|slice:"-1" == 'O' %}⭕
+        <!---->
+        {% else%}⬜ {% endif %} {% endwith %}
+        <!---->
       </div>
       {% endfor %}
     </div>
-    {% endif %}
   </div>
 
   <!-- Botones de acción -->
@@ -116,7 +114,6 @@
     </form>
     {% endif %}
 
-    <!-- Botón de actualizar -->
     <button
       onclick="location.reload()"
       style="
@@ -136,8 +133,9 @@
     </button>
   </div>
 
-  <!-- Información adicional -->
+  <!-- Estado WebSocket -->
   <div
+    id="socket-status"
     style="
       margin-top: 30px;
       padding: 15px;
@@ -147,28 +145,107 @@
     "
   >
     <p style="margin: 0; color: #495057; font-size: 14px">
-      <strong>Nota:</strong>
-      {% if game.game_state == 'active' %} {% if user == game.owner %} Haz clic
-      en una casilla vacía para colocar tu ficha. {% else %} Solo el creador del
-      juego puede hacer movimientos. {% endif %} {% elif game.game_state ==
-      'won' %} ¡El juego ha terminado! Puedes crear un nuevo juego si lo deseas.
-      {% else %} ¡Ha sido un empate! Puedes crear un nuevo juego si lo deseas.
-      {% endif %}
+      <strong>Conexión WebSocket:</strong>
+      <span id="connection-status">Conectando...</span>
     </p>
   </div>
 </div>
 
 <style>
-  /* Efectos hover para todos los botones */
-  a:hover,
-  button:hover {
+  .game-cell:hover {
+    background-color: #e8f5e9 !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
-
-  a,
-  button {
-    transition: all 0.3s ease;
-  }
 </style>
+
+<!-- Script WebSocket simplificado -->
+<script>
+  const roomId = "{{ game.room_name }}";
+  const userId = "{{ user.id }}";
+
+  console.log("Conectando a sala:", roomId);
+
+  // Crear conexión WebSocket
+  const gameSocket = new WebSocket(
+    "ws://" + window.location.host + "/ws/game/" + roomId + "/"
+  );
+  const connectionStatus = document.getElementById("connection-status");
+
+  gameSocket.onopen = function (e) {
+    console.log("✅ Conectado al socket");
+    connectionStatus.textContent = "✅ Conectado";
+    connectionStatus.style.color = "#28a745";
+  };
+
+  gameSocket.onerror = function (e) {
+    console.error("❌ Error en WebSocket");
+    connectionStatus.textContent = "❌ Error de conexión";
+    connectionStatus.style.color = "#dc3545";
+  };
+
+  gameSocket.onclose = function (e) {
+    console.log("🔌 Conexión cerrada");
+    connectionStatus.textContent = "❌ Desconectado";
+    connectionStatus.style.color = "#dc3545";
+  };
+
+  gameSocket.onmessage = function (e) {
+    console.log("📨 Mensaje recibido:", e.data);
+    const data = JSON.parse(e.data).my_data;
+
+    // Mostrar error si hay
+    if (data.error) {
+      alert("Error: " + data.error);
+      return;
+    }
+
+    // Actualizar tablero
+    if (data.board) {
+      data.board.forEach((cell, index) => {
+        const cellElement = document.getElementById(`cell-${index}`);
+        if (cellElement) {
+          cellElement.innerHTML =
+            cell === " " ? "⬜" : cell === "X" ? "❌" : "⭕";
+        }
+      });
+    }
+
+    // Actualizar mensaje de turno
+    const turnMessage = document.getElementById("turn-message");
+    if (turnMessage && data.game_state === "active") {
+      turnMessage.innerHTML = "Turno del Jugador " + data.active_player;
+    }
+
+    // Mostrar ganador/empate
+    if (data.game_state === "won") {
+      turnMessage.innerHTML = "🏆 ¡Ganó el Jugador " + data.winner + "!";
+    } else if (data.game_state === "tie") {
+      turnMessage.innerHTML = "🤝 ¡Es un empate!";
+    }
+  };
+
+  // Manejar clics en las celdas
+  document.addEventListener("DOMContentLoaded", function () {
+    const cells = document.querySelectorAll(".game-cell");
+    cells.forEach((cell) => {
+      cell.addEventListener("click", function () {
+        if (gameSocket.readyState !== WebSocket.OPEN) {
+          alert("No hay conexión WebSocket. Recarga la página.");
+          return;
+        }
+
+        const position = parseInt(this.dataset.position);
+        console.log("Enviando movimiento a posición:", position);
+
+        gameSocket.send(
+          JSON.stringify({
+            position: position,
+          })
+        );
+      });
+    });
+  });
+</script>
+
 {% endblock %}
