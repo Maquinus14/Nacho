@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 {% load static tailwind_tags %} {% load static %}
 <html>
   <head>
@@ -27,7 +27,9 @@
         padding: 0;
         margin: 0;
         cursor: pointer;
-        transition: color 0.2s, transform 0.2s;
+        transition:
+          color 0.2s,
+          transform 0.2s;
       }
 
       nav a:hover,
@@ -80,7 +82,9 @@
         font-weight: 600;
         font-size: 1.1rem;
         cursor: pointer;
-        transition: color 0.2s, transform 0.2s;
+        transition:
+          color 0.2s,
+          transform 0.2s;
       }
 
       form.logout-form button:hover {
@@ -103,6 +107,9 @@
             <a href="{% url 'products:list' %}">Products</a>
             {% endif %}
             <a href="{% url 'games:game_list' %}">Games</a>
+            <a href="{% url 'meme_gallery' %}" class="btn btn-primary"
+              >Ver Memes</a
+            >
           </div>
 
           <!-- Sección derecha -->
